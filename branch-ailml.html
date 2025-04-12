@@ -1,1 +1,737 @@
-window.location.href = 'index.html'; 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & ML - Attendance System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #f5f6fa;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            font-size: 1.5rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 0.5rem 1rem;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .branch-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .branch-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .branch-header h2 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .branch-header p {
+            color: #666;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-title {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .search-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .attendance-table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .attendance-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .attendance-table th,
+        .attendance-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .attendance-table th {
+            background: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .attendance-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-present {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .status-absent {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .status-late {
+            color: #ffc107;
+            font-weight: bold;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .page-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover {
+            background: #f8f9fa;
+        }
+
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .status-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 0.2rem;
+        }
+
+        .status-btn.present {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-btn.absent {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status-btn.late {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .status-btn:hover {
+            opacity: 0.9;
+        }
+
+        .status-btn.selected {
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px currentColor;
+        }
+
+        .data-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+
+        .data-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .data-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .data-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #667eea;
+            color: white;
+        }
+
+        .data-btn:hover {
+            opacity: 0.9;
+        }
+
+        .email-btn {
+            background: #28a745;
+        }
+
+        .email-form {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .email-form.show {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .cancel-btn {
+            background: #6c757d;
+        }
+
+        .saved-data {
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .data-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-item:last-child {
+            border-bottom: none;
+        }
+
+        .date-input {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>AI & ML Branch</h1>
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+            <button class="nav-btn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="branch-container">
+        <div class="branch-header">
+            <h2>AI & ML Branch</h2>
+            <p>Manage attendance for AI & ML students</p>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-title">Total Students</div>
+                <div class="stat-value" id="totalStudents">25</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Present Today</div>
+                <div class="stat-value" id="presentStudents">20</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Attendance Rate</div>
+                <div class="stat-value" id="attendanceRate">80%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Absent Today</div>
+                <div class="stat-value" id="absentStudents">5</div>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search by name, ID, or phone number..." onkeyup="searchStudents(this.value)">
+        </div>
+
+        <div class="attendance-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Roll No</th>
+                        <th>Phone Number</th>
+                        <th>Email</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>AILML001</td>
+                        <td>Aditya Sharma</td>
+                        <td>1</td>
+                        <td>9876543210</td>
+                        <td>aditya.sharma@example.com</td>
+                        <td><input type="date" class="date-input" value="2024-03-20"></td>
+                        <td class="status-present">Present</td>
+                        <td>9:00 AM</td>
+                        <td>
+                            <button class="status-btn present selected" onclick="updateStatus(this, 'present')">Present</button>
+                            <button class="status-btn absent" onclick="updateStatus(this, 'absent')">Absent</button>
+                            <button class="status-btn late" onclick="updateStatus(this, 'late')">Late</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>AILML002</td>
+                        <td>Priya Patel</td>
+                        <td>2</td>
+                        <td>9876543211</td>
+                        <td>priya.patel@example.com</td>
+                        <td><input type="date" class="date-input" value="2024-03-20"></td>
+                        <td class="status-present">Present</td>
+                        <td>9:15 AM</td>
+                        <td>
+                            <button class="status-btn present selected" onclick="updateStatus(this, 'present')">Present</button>
+                            <button class="status-btn absent" onclick="updateStatus(this, 'absent')">Absent</button>
+                            <button class="status-btn late" onclick="updateStatus(this, 'late')">Late</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>AILML003</td>
+                        <td>Rahul Verma</td>
+                        <td>3</td>
+                        <td>9876543212</td>
+                        <td>rahul.verma@example.com</td>
+                        <td><input type="date" class="date-input" value="2024-03-20"></td>
+                        <td class="status-absent">Absent</td>
+                        <td>-</td>
+                        <td>
+                            <button class="status-btn present" onclick="updateStatus(this, 'present')">Present</button>
+                            <button class="status-btn absent selected" onclick="updateStatus(this, 'absent')">Absent</button>
+                            <button class="status-btn late" onclick="updateStatus(this, 'late')">Late</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>AILML004</td>
+                        <td>Neha Gupta</td>
+                        <td>4</td>
+                        <td>9876543213</td>
+                        <td>neha.gupta@example.com</td>
+                        <td><input type="date" class="date-input" value="2024-03-20"></td>
+                        <td class="status-late">Late</td>
+                        <td>9:45 AM</td>
+                        <td>
+                            <button class="status-btn present" onclick="updateStatus(this, 'present')">Present</button>
+                            <button class="status-btn absent" onclick="updateStatus(this, 'absent')">Absent</button>
+                            <button class="status-btn late selected" onclick="updateStatus(this, 'late')">Late</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>AILML005</td>
+                        <td>Arjun Singh</td>
+                        <td>5</td>
+                        <td>9876543214</td>
+                        <td>arjun.singh@example.com</td>
+                        <td><input type="date" class="date-input" value="2024-03-20"></td>
+                        <td class="status-present">Present</td>
+                        <td>9:00 AM</td>
+                        <td>
+                            <button class="status-btn present selected" onclick="updateStatus(this, 'present')">Present</button>
+                            <button class="status-btn absent" onclick="updateStatus(this, 'absent')">Absent</button>
+                            <button class="status-btn late" onclick="updateStatus(this, 'late')">Late</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+        </div>
+
+        <div class="data-section">
+            <div class="data-header">
+                <h3>Attendance Data</h3>
+                <div class="data-buttons">
+                    <button class="data-btn" onclick="saveAttendanceData()">Save Data</button>
+                    <button class="data-btn" onclick="exportAttendanceData()">Export to Text</button>
+                    <button class="data-btn email-btn" onclick="toggleEmailForm()">Send Email</button>
+                </div>
+            </div>
+            <div class="email-form" id="emailForm">
+                <div class="form-group">
+                    <label for="emailTo">To:</label>
+                    <input type="email" id="emailTo" placeholder="recipient@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="emailSubject">Subject:</label>
+                    <input type="text" id="emailSubject" placeholder="Attendance Report">
+                </div>
+                <div class="form-group">
+                    <label for="emailBody">Message:</label>
+                    <textarea id="emailBody" placeholder="Enter your message here..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button class="data-btn cancel-btn" onclick="toggleEmailForm()">Cancel</button>
+                    <button class="data-btn" onclick="sendEmail()">Send</button>
+                </div>
+            </div>
+            <div class="saved-data" id="savedData">
+                <!-- Saved data will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            // Clear session storage
+            sessionStorage.clear();
+            // Redirect to login page
+            window.location.href = 'login.html';
+        }
+
+        function searchStudents(query) {
+            const table = document.querySelector('.attendance-table table');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                let found = false;
+
+                for (let j = 0; j < cells.length - 1; j++) {
+                    const cell = cells[j];
+                    if (cell.textContent.toLowerCase().includes(query.toLowerCase())) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                row.style.display = found ? '' : 'none';
+            }
+        }
+
+        function updateStatus(button, status) {
+            const row = button.closest('tr');
+            const statusCell = row.querySelector('td:nth-child(7)');
+            const timeCell = row.querySelector('td:nth-child(8)');
+            const dateInput = row.querySelector('.date-input');
+            const buttons = row.querySelectorAll('.status-btn');
+
+            // Remove selected class from all buttons
+            buttons.forEach(btn => btn.classList.remove('selected'));
+
+            // Add selected class to clicked button
+            button.classList.add('selected');
+
+            // Update status cell
+            statusCell.className = `status-${status}`;
+            statusCell.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+
+            // Update time cell
+            if (status === 'present' || status === 'late') {
+                const now = new Date();
+                const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                timeCell.textContent = time;
+            } else {
+                timeCell.textContent = '-';
+            }
+
+            // Update statistics
+            updateStatistics();
+        }
+
+        function updateStatistics() {
+            const table = document.querySelector('.attendance-table table');
+            const rows = table.getElementsByTagName('tr');
+            let total = rows.length - 1;
+            let present = 0;
+            let absent = 0;
+            let late = 0;
+
+            for (let i = 1; i < rows.length; i++) {
+                const status = rows[i].querySelector('td:nth-child(7)').textContent;
+                if (status === 'Present') present++;
+                else if (status === 'Absent') absent++;
+                else if (status === 'Late') late++;
+            }
+
+            document.getElementById('totalStudents').textContent = total;
+            document.getElementById('presentStudents').textContent = present;
+            document.getElementById('absentStudents').textContent = absent;
+            document.getElementById('attendanceRate').textContent = 
+                Math.round((present + late) / total * 100) + '%';
+        }
+
+        function saveAttendanceData() {
+            const table = document.querySelector('.attendance-table table');
+            const rows = table.getElementsByTagName('tr');
+            let present = 0;
+            let absent = 0;
+            let late = 0;
+            let attendanceData = [];
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                const studentId = cells[0].textContent;
+                const name = cells[1].textContent;
+                const date = cells[5].querySelector('.date-input').value;
+                const status = cells[6].textContent;
+                const time = cells[7].textContent;
+
+                if (status === 'Present') present++;
+                else if (status === 'Absent') absent++;
+                else if (status === 'Late') late++;
+
+                attendanceData.push({
+                    studentId,
+                    name,
+                    date,
+                    status,
+                    time
+                });
+            }
+
+            const now = new Date();
+            const currentDate = now.toLocaleDateString();
+            const currentTime = now.toLocaleTimeString();
+
+            saveToLocalStorage(currentDate, currentTime, present, absent, late, attendanceData);
+            alert('Attendance data saved successfully!');
+        }
+
+        function saveToLocalStorage(date, time, present, absent, late, attendanceData) {
+            let savedData = JSON.parse(localStorage.getItem('ailmlAttendanceData') || '[]');
+            savedData.push({
+                date,
+                time,
+                present,
+                absent,
+                late,
+                attendanceData
+            });
+            localStorage.setItem('ailmlAttendanceData', JSON.stringify(savedData));
+            displaySavedData();
+        }
+
+        function displaySavedData() {
+            const savedData = JSON.parse(localStorage.getItem('ailmlAttendanceData') || '[]');
+            const container = document.getElementById('savedData');
+            container.innerHTML = '';
+
+            savedData.reverse().forEach(data => {
+                const div = document.createElement('div');
+                div.className = 'data-item';
+                div.innerHTML = `
+                    <strong>Date:</strong> ${data.date}<br>
+                    <strong>Time:</strong> ${data.time}<br>
+                    <strong>Present:</strong> ${data.present} | 
+                    <strong>Absent:</strong> ${data.absent} | 
+                    <strong>Late:</strong> ${data.late}<br>
+                    <strong>Details:</strong><br>
+                    ${data.attendanceData.map(student => 
+                        `${student.name} (${student.studentId}): ${student.status} at ${student.time} on ${student.date}`
+                    ).join('<br>')}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function exportAttendanceData() {
+            const savedData = JSON.parse(localStorage.getItem('ailmlAttendanceData') || '[]');
+            let content = 'AI & ML Branch Attendance Data\n\n';
+            
+            savedData.forEach(data => {
+                content += `Date: ${data.date}\n`;
+                content += `Time: ${data.time}\n`;
+                content += `Present: ${data.present}\n`;
+                content += `Absent: ${data.absent}\n`;
+                content += `Late: ${data.late}\n`;
+                content += '\nStudent Details:\n';
+                data.attendanceData.forEach(student => {
+                    content += `${student.name} (${student.studentId}): ${student.status} at ${student.time} on ${student.date}\n`;
+                });
+                content += '-------------------\n';
+            });
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ailml_attendance_data.txt';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        function toggleEmailForm() {
+            const emailForm = document.getElementById('emailForm');
+            emailForm.classList.toggle('show');
+            
+            if (emailForm.classList.contains('show')) {
+                // Pre-fill the email body with attendance data
+                const table = document.querySelector('.attendance-table table');
+                const rows = table.getElementsByTagName('tr');
+                let emailBody = 'AI & ML Branch Attendance Report\n\n';
+                
+                for (let i = 1; i < rows.length; i++) {
+                    const cells = rows[i].getElementsByTagName('td');
+                    const studentId = cells[0].textContent;
+                    const name = cells[1].textContent;
+                    const date = cells[5].querySelector('.date-input').value;
+                    const status = cells[6].textContent;
+                    const time = cells[7].textContent;
+                    
+                    emailBody += `${name} (${studentId}): ${status} at ${time} on ${date}\n`;
+                }
+                
+                document.getElementById('emailBody').value = emailBody;
+            }
+        }
+
+        function sendEmail() {
+            const to = document.getElementById('emailTo').value;
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').value;
+            
+            if (!to || !subject || !body) {
+                alert('Please fill in all email fields');
+                return;
+            }
+            
+            // In a real application, this would send an actual email
+            // For this demo, we'll just show an alert
+            alert(`Email would be sent to: ${to}\nSubject: ${subject}\n\nBody: ${body.substring(0, 100)}...`);
+            
+            // Hide the email form
+            toggleEmailForm();
+        }
+
+        // Display saved data when page loads
+        displaySavedData();
+    </script>
+</body>
+</html> 
